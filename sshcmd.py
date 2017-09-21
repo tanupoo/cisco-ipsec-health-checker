@@ -7,21 +7,35 @@ import sys
 import os
 import paramiko
 
-'''
-test code
-'''
 class sshcmd():
     def __init__(self, server, username, password, port=22,
-                 keyfile="~/.ssh/known_hosts", debug=False):
+                 hostkey_file="~/.ssh/known_hosts",
+                 mode="pwd", pkey_file=None, debug=False):
+        '''
+        mode: "pwd" or "rsa"
+        pkey_file: valid if mode is "rsa"
+        '''
         if debug:
             paramiko.common.logging.basicConfig(level=paramiko.common.DEBUG)
-        keys = os.path.expanduser(keyfile)
+        hostkey_file = os.path.expanduser(hostkey_file)
         self.ssh = paramiko.SSHClient()
-        self.ssh.load_system_host_keys(keys)
-        self.ssh.connect(server, port=port,
-                    username=username, password=password,
-                    allow_agent=False,
-                    timeout=15, auth_timeout=15)
+        self.ssh.load_system_host_keys(hostkey_file)
+        #
+        if mode == "rsa":
+            pkey_file = os.path.expanduser(pkey_file)
+            pkey = paramiko.RSAKey.from_private_key_file(pkey_file,
+                                                         password=password)
+            self.ssh.connect(server, port=port,
+                            username=username,
+                            pkey=pkey,
+                            allow_agent=False,
+                            timeout=15, auth_timeout=15)
+        elif mode == "pwd":
+            self.ssh.connect(server, port=port,
+                            username=username,
+                            password=password,
+                            allow_agent=False,
+                            timeout=15, auth_timeout=15)
 
     def execcmd(self, cmd):
         #ssh_stdin, ssh_stdout, ssh_stderr = self.ssh.exec_command(cmd)
