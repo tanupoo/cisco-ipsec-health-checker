@@ -6,29 +6,52 @@ from __future__ import print_function
 import sys
 import re
 import argparse
+from argparse import RawDescriptionHelpFormatter
 import os
 from ping import do_ping
 from sshcmd import sshcmd
 
 def parse_args():
     p = argparse.ArgumentParser(
+            formatter_class=RawDescriptionHelpFormatter,
             description="The IPsec end point health checker.",
-            epilog="Instead of specifying the username and password in the argument, the environment variable of HLCHK_SSH_USR and HLCHK_SSH_PWD can be used to specify the username and password respectively.")
+            epilog="""
+ENVIRONMENT VARIABLE:
+
+  Instead of specifying the username and password in the argument, the
+  environment variable of HLCHK_SSH_USR and HLCHK_SSH_PWD can be used
+  to specify the username and password respectively.
+
+NOTE:
+
+  It does not look to define a general rule of the tag to pick the IP address
+  of the peer assigned.  The known tags are like below:
+
+  IKEv1 pre-shared key of ISR4000 IOS 16.5:
+    IPSEC FLOW:.*host ([\w\d\.]+)
+
+  IKEv2 RSA-SIG of ISR4000 IOS 16.5:
+    Assigned address: ([\w\d\.]+)
+
+""")
     p.add_argument("-s", required=True, action="store", dest="server",
         help="specify the server address.")
     p.add_argument("-u", action="store", dest="username",
         help="specify the user name to execute the command.")
     p.add_argument("-p", action="store", dest="password",
         help="specify the password for the user.")
-    p.add_argument("--sshport", action="store", dest="sshport", type=int,
+    p.add_argument("--sshport", action="store", dest="ssh_port", type=int,
         default=22,
         help="specify the ssh port number. default is 22")
+    p.add_argument("--sshmode", action="store", dest="ssh_mode",
+        default="psk",
+        help="specify the ssh authentication mode. Either 'pwd' or 'rsa' can be specified. default is 'pwd'")
     p.add_argument("--timeout", action="store", dest="timeout", type=int,
         default=15,
         help="specify the timeout to pint. default is 15")
     p.add_argument("--tagtype", action="store", dest="tag_type",
         default="rsa",
-        help="Either 'rsa' or 'psk' can be specified to pick the IP address of the peer assigned. default is psk")
+        help="specify the tag type to pick up the peer's IP address. Either 'rsa' or 'psk' can be specified. default is 'psk'")
     p.add_argument("-v", action="store_true", dest="f_verbose", default=False,
         help="enable verbose mode.")
     p.add_argument("-d", action="append_const", dest="_f_debug", default=[],
@@ -43,10 +66,9 @@ def parse_args():
     return args
 
 '''
-test code
+main
 '''
 opt = parse_args()
-
 do_debug = False
 if opt.debug_level:
     do_debug = True
@@ -67,7 +89,7 @@ if not opt.password:
 cmd = "show crypto session"
 
 ssh = sshcmd(opt.server, opt.username, opt.password,
-             port=opt.sshport, debug=do_debug)
+             port=opt.ssh_port, mode=opt.ssh_mode, debug=do_debug)
 ssh_stdin, ssh_stdout, ssh_stderr = ssh.execcmd(cmd)
 
 if opt.tag_type == "psk":
