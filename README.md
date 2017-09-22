@@ -6,6 +6,11 @@ And, it takes a set of IP addresses which are assigned to the peer
 for the IPsec tunnel.
 Then, it tries to send some ping packets to each of them.
 
+## REQUIREMENT
+
+- python2.7.  python3 is not tested.
+- [paramiko](http://www.paramiko.org/), a python module for ssh.  The instruction to install paramiko is [here](http://www.paramiko.org/installing.html).
+
 ## USAGE
 
     ipsec-health-check.py [-h] -s SERVER [-u USERNAME] [-p PASSWORD]
