@@ -10,7 +10,7 @@ import paramiko
 class sshcmd():
     def __init__(self, server, username, password, port=22,
                  hostkey_file="~/.ssh/known_hosts",
-                 mode="pwd", pkey_file=None, debug=False):
+                 mode="pwd", pkey_file="~/.ssh/id_rsa", debug=False):
         '''
         mode: "pwd" or "rsa"
         pkey_file: valid if mode is "rsa"
