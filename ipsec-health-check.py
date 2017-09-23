@@ -10,6 +10,10 @@ from argparse import RawDescriptionHelpFormatter
 import os
 from ping import do_ping
 from sshcmd import sshcmd
+import logging
+from logging.handlers import SysLogHandler as syslog
+
+_NAME="ipsec-health-check"
 
 def parse_args():
     p = argparse.ArgumentParser(
@@ -40,6 +44,8 @@ NOTE:
         help="specify the user name to execute the command.")
     p.add_argument("-p", action="store", dest="password",
         help="specify the password for the user.")
+    p.add_argument("--syslog", action="store_true", dest="f_syslog",
+        help="enable to send a message to syslog. default is disable.")
     p.add_argument("--sshport", action="store", dest="ssh_port", type=int,
         default=22,
         help="specify the ssh port number. default is 22")
@@ -50,15 +56,19 @@ NOTE:
         default=15,
         help="specify the timeout to pint. default is 15")
     p.add_argument("--tagtype", action="store", dest="tag_type",
-        default="rsa",
-        help="specify the tag type to pick up the peer's IP address. Either 'rsa' or 'psk' can be specified. default is 'psk'")
+        default="rsa", choices=["rsa", "psk"],
+        help="specify the tag type to pick up the peer's IP address. default is 'psk'")
+    p.add_argument("--ping-timeout-opt", action="store",
+        dest="ping_timeout_opt", default="-W",
+        help="specify the option name of the ping timeout. default is '-W'")
+    p.add_argument("--show-ipsec-session-command", action="store",
+        dest="show_sa_cmd", default="show crypto session",
+        help="specify the option name of the ping timeout. default is '-W'")
     p.add_argument("-v", action="store_true", dest="f_verbose", default=False,
         help="enable verbose mode.")
     p.add_argument("-d", action="append_const", dest="_f_debug", default=[],
         const=1, help="increase debug mode.")
-    p.add_argument("--verbose", action="store_true", dest="f_verbose",
-        default=False, help="enable verbose mode.")
-    p.add_argument("--version", action="version", version="%(prog)s 1.0")
+    p.add_argument("--version", action="version", version="%(prog)s 0.1")
 
     args = p.parse_args()
     args.debug_level = len(args._f_debug)
@@ -69,9 +79,6 @@ NOTE:
 main
 '''
 opt = parse_args()
-do_debug = False
-if opt.debug_level:
-    do_debug = True
 
 if not opt.username:
     opt.username = os.getenv("HLCHK_SSH_USR")
@@ -85,13 +92,29 @@ if not opt.password:
         print("ERROR: password is required.")
         exit(1)
 
+# setup logging
+logger = logging.getLogger(_NAME)
+if opt.f_syslog:
+    ch = syslog(facility=syslog.LOG_USER)
+    fmt = logging.Formatter(
+            fmt="%(name)s:%(levelname)s: %(message)s")
+else:
+    ch = logging.StreamHandler()
+    fmt = logging.Formatter(
+            fmt="%(asctime)s:%(name)s:%(levelname)s: %(message)s",
+            datefmt="%Y-%m-%dT%H:%M:%S")
 #
-cmd = "show crypto session"
+ch.setFormatter(fmt)
+do_debug = False
+if opt.debug_level:
+    do_debug = True
+    logger.setLevel(logging.DEBUG)
+else:
+    logger.setLevel(logging.INFO)
+#
+logger.addHandler(ch)
 
-ssh = sshcmd(opt.server, opt.username, opt.password,
-             port=opt.ssh_port, mode=opt.ssh_mode, debug=do_debug)
-ssh_stdin, ssh_stdout, ssh_stderr = ssh.execcmd(cmd)
-
+#
 if opt.tag_type == "psk":
     # ISR4000 IOS 16.5 IKEv1 PSK
     re_host = re.compile("IPSEC FLOW:.*host ([\w\d\.]+)")
@@ -99,18 +122,33 @@ elif opt.tag_type == "rsa":
     # ISR4000 IOS 16.5 IKEv2 RSA
     re_host = re.compile("Assigned address: ([\w\d\.]+)")
 else:
-    print("ERROR: invalid tag type.")
+    logger.error("ERROR: invalid tag type.")
     exit(1)
+
+#
+# start
+#
+logger.info("start ipsec-health-check")
+
+ssh = sshcmd(opt.server, opt.username, opt.password,
+             port=opt.ssh_port, mode=opt.ssh_mode, debug=do_debug)
+ssh_stdin, ssh_stdout, ssh_stderr = ssh.execcmd(opt.show_sa_cmd)
 
 for line in ssh_stdout:
     if opt.debug_level > 1:
-        print(line)
+        logger.debug(line)
     r = re_host.search(line)
     if r:
         addr = r.group(1)
-        print("addr: %s" % addr)
-        tx, rx, loss = do_ping(addr, debug=do_debug)
-        if loss > 99:
-            print("%s is not stable." % addr)
+        ret = do_ping(addr, ping_timeout_opt=opt.ping_timeout_opt,
+                      debug=do_debug)
+        if opt.f_verbose or opt.debug_level:
+            logger.info("addr:%s, tx:%s, rx:%s, loss:%s%%" % (addr, ret["tx"],
+                                                        ret["rx"], ret["loss"]))
+        if ret["loss"] > 99:
+            logger.warn("%s is not stable." % addr)
 
 ssh.close()
+
+logger.info("end ipsec-health-check")
+logging.shutdown()
