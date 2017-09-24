@@ -6,6 +6,10 @@ And, it takes a set of IP addresses which are assigned to the peer
 for the IPsec tunnel.
 Then, it tries to send some ping packets to each of them.
 
+The default timeout is 15 seconds for each ping.
+Please note that it takes 15 seconds multiplied
+by the number of peers at most to check the all peers.
+
 ## REQUIREMENT
 
 - python2.7.  python3 is not tested.
