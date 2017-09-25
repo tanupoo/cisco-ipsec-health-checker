@@ -119,7 +119,7 @@ by the --ping-command option.
 
     OSError: [Errno 2] No such file or directory
 
-## Syslog configuration example for rsyslog.
+## Configuration example for rsyslog.
 
 setup the rsyslog.conf to allow the UDP access.
 
@@ -149,4 +149,4 @@ Then, restart the rsyslog.
 
     service rsyslog restart
 
-
+Enjoy.
