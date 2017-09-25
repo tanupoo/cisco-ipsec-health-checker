@@ -30,7 +30,7 @@ class sshcmd():
                             pkey=pkey,
                             allow_agent=False,
                             timeout=15, auth_timeout=15)
-        elif mode == "psk":
+        elif mode == "pwd":
             self.ssh.connect(server, port=port,
                             username=username,
                             password=password,
