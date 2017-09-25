@@ -51,8 +51,8 @@ NOTE:
         default=22,
         help="specify the ssh port number. default is 22")
     p.add_argument("--sshmode", action="store", dest="ssh_mode",
-        default="psk",
-        help="specify the ssh authentication mode. Either 'pwd' or 'rsa' can be specified. default is 'pwd'")
+        default="rsa",
+        help="specify the ssh authentication mode. Either 'pwd' or 'rsa' can be specified. default is 'rsa'")
     p.add_argument("--timeout", action="store", dest="timeout", type=int,
         default=15,
         help="specify the timeout to pint. default is 15")
@@ -64,6 +64,9 @@ NOTE:
         help="specify the option name of the ping timeout. default is '-W'")
     p.add_argument("--show-ipsec-session-command", action="store",
         dest="show_sa_cmd", default=_SHOW_SA_CMD,
+        help="specify the command to show the ipsec session. default is 'show crypto session'")
+    p.add_argument("--ping-command", action="store",
+        dest="ping_cmd", default="/sbin/ping",
         help="specify the option name of the ping timeout. default is '-W'")
     p.add_argument("-v", action="store_true", dest="f_verbose", default=False,
         help="enable verbose mode.")
@@ -142,6 +145,7 @@ for line in ssh_stdout:
     if r:
         addr = r.group(1)
         ret = do_ping(addr, ping_timeout_opt=opt.ping_timeout_opt,
+                      ping_cmd=opt.ping_cmd,
                       debug=do_debug)
         if opt.f_verbose or opt.debug_level:
             logger.info("addr:%s, tx:%s, rx:%s, loss:%s%%" % (addr, ret["tx"],
