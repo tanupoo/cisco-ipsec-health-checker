@@ -14,6 +14,7 @@ import logging
 from logging.handlers import SysLogHandler as syslog
 
 _NAME="ipsec-health-check"
+_SHOW_SA_CMD="show crypto session"
 
 def parse_args():
     p = argparse.ArgumentParser(
@@ -57,12 +58,12 @@ NOTE:
         help="specify the timeout to pint. default is 15")
     p.add_argument("--tagtype", action="store", dest="tag_type",
         default="rsa", choices=["rsa", "psk"],
-        help="specify the tag type to pick up the peer's IP address. default is 'psk'")
+        help="specify the tag type to pick up the peer's IP address. default is 'rsa'")
     p.add_argument("--ping-timeout-opt", action="store",
         dest="ping_timeout_opt", default="-W",
         help="specify the option name of the ping timeout. default is '-W'")
     p.add_argument("--show-ipsec-session-command", action="store",
-        dest="show_sa_cmd", default="show crypto session",
+        dest="show_sa_cmd", default=_SHOW_SA_CMD,
         help="specify the option name of the ping timeout. default is '-W'")
     p.add_argument("-v", action="store_true", dest="f_verbose", default=False,
         help="enable verbose mode.")
