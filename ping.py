@@ -22,6 +22,8 @@ def do_ping(addr, count=2, timeout=5, ping_cmd="/sbin/ping",
     loss = 100.
     try:
         ret = subprocess.check_output(cmd)
+    except OSError as e:
+        raise
     except Exception as e:
         return { "tx":tx, "rx":rx, "loss":loss, "error":repr(e) }
     r = re_ping.search(ret)
