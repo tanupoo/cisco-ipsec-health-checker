@@ -55,3 +55,19 @@ by the number of peers at most to check the all peers.
         IKEv2 RSA-SIG of ISR4000 IOS 16.5:
           Assigned address: ([\w\d\.]+)
 
+## EXAMPLE
+
+    % export HLCHK_SSH_USR="admin"
+    % export HLCHK_SSH_PWD="password"
+
+    % ipsec-health-check.py -s 10.0.0.1 --tagtype psk --ping-timeout-opt '\-t' 
+    2017-09-25T11:46:37:ipsec-health-check:INFO: start ipsec-health-check
+    2017-09-25T11:46:43:ipsec-health-check:WARNING: 192.168.1.35 is not stable.
+    2017-09-25T11:46:43:ipsec-health-check:INFO: end ipsec-health-check
+
+    % ipsec-health-check.py -s 10.0.0.1 --tagtype psk --ping-timeout-opt '\-t' -v 
+    2017-09-25T11:45:44:ipsec-health-check:INFO: start ipsec-health-check
+    2017-09-25T11:45:50:ipsec-health-check:INFO: addr:192.168.1.35, tx:2, rx:0, loss:100.0%
+    2017-09-25T11:45:50:ipsec-health-check:WARNING: 192.168.1.35 is not stable.
+    2017-09-25T11:45:50:ipsec-health-check:INFO: end ipsec-health-check
+
