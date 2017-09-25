@@ -14,6 +14,10 @@ by the number of peers at most to check the all peers.
 
 - only python2.7 is tested.  python3 is not tested.
 - [paramiko](http://www.paramiko.org/), a python module for ssh.  The instruction to install paramiko is [here](http://www.paramiko.org/installing.html).
+- known_hosts
+
+you have to create known_hosts before you use this script.
+you have to login into the server at once.
 
 ## USAGE
 
@@ -71,10 +75,26 @@ by the number of peers at most to check the all peers.
 
 ## EXAMPLE
 
-    % ipsec-health-check.py -s 10.0.0.1 -u admin -p password --tagtype psk --ping-timeout-opt '\-t' 
-    2017-09-25T11:46:37:ipsec-health-check:INFO: start ipsec-health-check
-    2017-09-25T11:46:43:ipsec-health-check:WARNING: 192.168.1.35 is not stable.
-    2017-09-25T11:46:43:ipsec-health-check:INFO: end ipsec-health-check
+If there is no problem, it only shows the start and end time.
+
+    % ipsec-health-check.py -s 10.71.158.190 -u admin -p 'lora,WAN-2017' --sshmode pwd --tagtype psk --ping-command=/usr/bin/ping 
+    2017-09-25T07:53:42:ipsec-health-check:INFO: start ipsec-health-check
+    2017-09-25T07:53:44:ipsec-health-check:INFO: end ipsec-health-check
+
+If something happens on the route, you can see a warning message.
+
+    % ipsec-health-check.py -s 10.71.158.190 -u admin -p 'lora,WAN-2017' --sshmode pwd --tagtype psk --ping-command=/usr/bin/ping 
+    2017-09-25T07:57:22:ipsec-health-check:INFO: start ipsec-health-check
+    2017-09-25T07:57:29:ipsec-health-check:WARNING: 192.168.1.36 is not stable.
+    2017-09-25T07:57:29:ipsec-health-check:INFO: end ipsec-health-check
+
+If you use the -v option, you can see a bit detail.
+
+    % ipsec-health-check.py -s 10.71.158.190 -u admin -p 'lora,WAN-2017' --sshmode pwd --tagtype psk --ping-command=/usr/bin/ping -v
+    2017-09-25T07:57:12:ipsec-health-check:INFO: start ipsec-health-check
+    2017-09-25T07:57:19:ipsec-health-check:INFO: addr:192.168.1.36, tx:2, rx:0, loss:100.0%
+    2017-09-25T07:57:19:ipsec-health-check:WARNING: 192.168.1.36 is not stable.
+    2017-09-25T07:57:19:ipsec-health-check:INFO: end ipsec-health-check
 
 You can defined the username and/or password in the environment variable
 like below.
@@ -82,11 +102,18 @@ like below.
     % export HLCHK_SSH_USR="admin"
     % export HLCHK_SSH_PWD="password"
 
-If you specify the -v option, you can see a bit more detail.
+## TROUBLE SHOOTING
 
-    % ipsec-health-check.py -s 10.0.0.1 --tagtype psk --ping-timeout-opt '\-t' -v 
-    2017-09-25T11:45:44:ipsec-health-check:INFO: start ipsec-health-check
-    2017-09-25T11:45:50:ipsec-health-check:INFO: addr:192.168.1.35, tx:2, rx:0, loss:100.0%
-    2017-09-25T11:45:50:ipsec-health-check:WARNING: 192.168.1.35 is not stable.
-    2017-09-25T11:45:50:ipsec-health-check:INFO: end ipsec-health-check
+### not found in known_hosts
+
+if you see the following line, you have to login into the server at once.
+
+    paramiko.ssh_exception.SSHException: Server '10.71.158.190' not found in known_hosts
+
+### No such file or directory
+
+if you see the following line, you have to specify the valid ping command
+by the --ping-command option.
+
+    OSError: [Errno 2] No such file or directory
 
