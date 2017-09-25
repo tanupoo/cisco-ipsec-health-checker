@@ -12,7 +12,7 @@ by the number of peers at most to check the all peers.
 
 ## REQUIREMENT
 
-- python2.7.  python3 is not tested.
+- only python2.7 is tested.  python3 is not tested.
 - [paramiko](http://www.paramiko.org/), a python module for ssh.  The instruction to install paramiko is [here](http://www.paramiko.org/installing.html).
 
 ## USAGE
