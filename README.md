@@ -1,7 +1,7 @@
 Simple IPsec health checker for Cisco router
 ============================================
 
-It just logins into the Cisco router you specified at the argument.
+It just logins into the Cisco router you specified in the argument.
 And, it takes a set of IP addresses which are assigned to the peer
 for the IPsec tunnel.
 Then, it tries to send some ping packets to each of them.
@@ -10,14 +10,16 @@ The default timeout is 15 seconds for each ping.
 Please note that it takes 15 seconds multiplied
 by the number of peers at most to check the all peers.
 
+It only supports SSH login.
+
 ## REQUIREMENT
 
 - only python2.7 is tested.  python3 is not tested.
 - [paramiko](http://www.paramiko.org/), a python module for ssh.  The instruction to install paramiko is [here](http://www.paramiko.org/installing.html).
 - known_hosts
 
-you have to create known_hosts before you use this script.
-you have to login into the server at once.
+You have to login into the server once so as to create
+known_hosts before you use this script.
 
 ## USAGE
 
