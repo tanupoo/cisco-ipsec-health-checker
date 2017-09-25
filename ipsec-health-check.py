@@ -67,7 +67,7 @@ NOTE:
         help="specify the command to show the ipsec session. default is 'show crypto session'")
     p.add_argument("--ping-command", action="store",
         dest="ping_cmd", default="/sbin/ping",
-        help="specify the option name of the ping timeout. default is '-W'")
+        help="specify the ping command. default is '/sbin/ping'.")
     p.add_argument("-v", action="store_true", dest="f_verbose", default=False,
         help="enable verbose mode.")
     p.add_argument("-d", action="append_const", dest="_f_debug", default=[],
