@@ -8,7 +8,10 @@ import re
 import subprocess
 import shlex
 
-re_ping = re.compile("(\d+) packets transmitted, (\d+) packets received, ([\d\.]+)% packet loss")
+re_ping = re.compile("(\d+) [^,]+, (\d+) [^,]+, ([\d\.]+)% packet loss")
+# MacOSX: 2 packets transmitted, 2 packets received, 0.0% packet loss
+# Ubuntu: 2 packets transmitted, 2 received, 0% packet loss, time 1001ms
+# RHEL  : 2 packets transmitted, 2 received, 0% packet loss, time 1001ms
 
 def do_ping(addr, count=2, timeout=5, ping_cmd="/sbin/ping",
             ping_timeout_opt="-W", debug=False):
