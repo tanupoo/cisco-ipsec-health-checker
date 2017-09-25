@@ -38,7 +38,6 @@ class sshcmd():
                             timeout=15, auth_timeout=15)
 
     def execcmd(self, cmd):
-        #ssh_stdin, ssh_stdout, ssh_stderr = self.ssh.exec_command(cmd)
         return self.ssh.exec_command(cmd)
 
     def close(self):
