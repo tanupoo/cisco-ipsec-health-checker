@@ -30,12 +30,14 @@ class sshcmd():
                             pkey=pkey,
                             allow_agent=False,
                             timeout=15, auth_timeout=15)
-        elif mode == "pwd":
+        elif mode == "psk":
             self.ssh.connect(server, port=port,
                             username=username,
                             password=password,
                             allow_agent=False,
                             timeout=15, auth_timeout=15)
+        else:
+            raise Exception("ERROR: invalid mode %s" % mode)
 
     def execcmd(self, cmd):
         return self.ssh.exec_command(cmd)
