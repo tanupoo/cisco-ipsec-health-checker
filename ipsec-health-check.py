@@ -72,7 +72,7 @@ NOTE:
         help="enable verbose mode.")
     p.add_argument("-d", action="append_const", dest="_f_debug", default=[],
         const=1, help="increase debug mode.")
-    p.add_argument("--version", action="version", version="%(prog)s 0.1")
+    p.add_argument("--version", action="version", version="%(prog)s 0.2")
 
     args = p.parse_args()
     args.debug_level = len(args._f_debug)
