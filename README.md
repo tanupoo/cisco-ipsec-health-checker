@@ -117,3 +117,34 @@ by the --ping-command option.
 
     OSError: [Errno 2] No such file or directory
 
+## Syslog configuration example for rsyslog.
+
+setup the rsyslog.conf to allow the UDP access.
+
+    % sudo vi /etc/rsyslog.conf
+    $ModLoad imudp
+    $UDPServerRun 514
+
+if you want rsyslog to only allow the access from the local system,
+you have to define UDPServerAddress like below.
+
+    % sudo vi /etc/rsyslog.conf
+    $ModLoad imudp
+    $UDPServerAddress 127.0.0.1
+    $UDPServerRun 514
+
+setup the config for this program to send the message into /var/log.
+
+    % cat /etc/rsyslog.d/ipsec-health-check.conf 
+    if $programname == 'ipsec-health-check' then /var/log/ipsec-health-check.log
+    & ~
+
+create the log file.
+
+    touch /var/log/ipsec-health-check.log
+
+Then, restart the rsyslog.
+
+    service rsyslog restart
+
+
