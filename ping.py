@@ -8,10 +8,10 @@ import re
 import subprocess
 import shlex
 
-re_ping = re.compile("(\d+) [^,]+, (\d+) [^,]+, ([\d\.]+)% packet loss")
 # MacOSX: 2 packets transmitted, 2 packets received, 0.0% packet loss
 # Ubuntu: 2 packets transmitted, 2 received, 0% packet loss, time 1001ms
 # RHEL  : 2 packets transmitted, 2 received, 0% packet loss, time 1001ms
+re_ping = re.compile("(\d+) packets trans[^,]+, (\d+) [^,]+, ([\d\.]+)% packet loss")
 
 def do_ping(addr, count=2, timeout=5, ping_cmd="/sbin/ping",
             ping_timeout_opt="-W", debug=False):
@@ -29,6 +29,10 @@ def do_ping(addr, count=2, timeout=5, ping_cmd="/sbin/ping",
         raise
     except Exception as e:
         return { "tx":tx, "rx":rx, "loss":loss, "error":repr(e) }
+    #
+    # re_ping.match() does not work because the ret contains the whole lines
+    # returned from the result of the ping.
+    #
     r = re_ping.search(ret)
     if r:
         tx = int(r.group(1))
