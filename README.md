@@ -18,25 +18,39 @@ by the number of peers at most to check the all peers.
 ## USAGE
 
     ipsec-health-check.py [-h] -s SERVER [-u USERNAME] [-p PASSWORD]
-                             [--sshport SSH_PORT] [--sshmode SSH_MODE]
-                             [--timeout TIMEOUT] [--tagtype TAG_TYPE] [-v]
-                             [-d] [--verbose] [--version]
-
+                                 [--syslog] [--sshport SSH_PORT]
+                                 [--sshmode SSH_MODE] [--timeout TIMEOUT]
+                                 [--tagtype {rsa,psk}]
+                                 [--ping-timeout-opt PING_TIMEOUT_OPT]
+                                 [--show-ipsec-session-command SHOW_SA_CMD]
+                                 [--ping-command PING_CMD] [-v] [-d] [--version]
+    
+    The IPsec end point health checker.
+    
     optional arguments:
-      -h, --help          show this help message and exit
-      -s SERVER           specify the server address.
-      -u USERNAME         specify the user name to execute the command.
-      -p PASSWORD         specify the password for the user.
-      --sshport SSH_PORT  specify the ssh port number. default is 22
-      --sshmode SSH_MODE  specify the ssh authentication mode. Either 'pwd' or
-                          'rsa' can be specified. default is 'pwd'
-      --timeout TIMEOUT   specify the timeout to pint. default is 15
-      --tagtype TAG_TYPE  specify the tag type to pick up the peer's IP address.
-                          Either 'rsa' or 'psk' can be specified. default is 'psk'
-      -v                  enable verbose mode.
-      -d                  increase debug mode.
-      --verbose           enable verbose mode.
-      --version           show program's version number and exit
+      -h, --help            show this help message and exit
+      -s SERVER             specify the server address.
+      -u USERNAME           specify the user name to execute the command.
+      -p PASSWORD           specify the password for the user.
+      --syslog              enable to send a message to syslog. default is
+                            disable.
+      --sshport SSH_PORT    specify the ssh port number. default is 22
+      --sshmode SSH_MODE    specify the ssh authentication mode. Either 'pwd' or
+                            'rsa' can be specified. default is 'rsa'
+      --timeout TIMEOUT     specify the timeout to pint. default is 15
+      --tagtype {rsa,psk}   specify the tag type to pick up the peer's IP address.
+                            default is 'rsa'
+      --ping-timeout-opt PING_TIMEOUT_OPT
+                            specify the option name of the ping timeout. default
+                            is '-W'
+      --show-ipsec-session-command SHOW_SA_CMD
+                            specify the command to show the ipsec session. default
+                            is 'show crypto session'
+      --ping-command PING_CMD
+                            specify the ping command. default is '/sbin/ping'.
+      -v                    enable verbose mode.
+      -d                    increase debug mode.
+      --version             show program's version number and exit
     
     ENVIRONMENT VARIABLE:
     
@@ -46,14 +60,14 @@ by the number of peers at most to check the all peers.
     
     NOTE:
     
-      It does not look to define a general rule of the tag to pick
-      the IP address of the peer assigned.  The known tags are like below:
+      It does not look to define a general rule of the tag to pick the IP address
+      of the peer assigned.  The known tags are like below:
     
-        IKEv1 pre-shared key of ISR4000 IOS 16.5:
-          IPSEC FLOW:.*host ([\w\d\.]+)
+      IKEv1 pre-shared key of ISR4000 IOS 16.5:
+        IPSEC FLOW:.*host ([\w\d\.]+)
     
-        IKEv2 RSA-SIG of ISR4000 IOS 16.5:
-          Assigned address: ([\w\d\.]+)
+      IKEv2 RSA-SIG of ISR4000 IOS 16.5:
+        Assigned address: ([\w\d\.]+)
 
 ## EXAMPLE
 
